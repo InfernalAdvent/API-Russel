@@ -3,8 +3,8 @@ const userService = require('../services/users');
 // Créer un utilisateur
 exports.addUsers = async (req, res) => {
     try {
-        const user = await userService.addUsers(req.body);
-        return res.status(201).json(user);
+        const newUser = await userService.addUsers(req.body);
+        return res.status(201).json(newUser);
     } catch (error) {
         if (error.code === 11000) {
             return res.status(400).json({ error: 'Cet email est déjà utilisé.' });
@@ -45,8 +45,8 @@ exports.getUserByEmail = async (req, res) => {
 // Mettre à jour un utilisateur
 exports.updateUser = async (req, res) => {
     try {
-        const user = await userService.updateUser(req.params.email, req.body);
-        if (!user) {
+        const updatedUser = await userService.updateUser(req.params.email, req.body);
+        if (!updatedUser) {
             return res.status(404).json({ error: 'Utilisateur introuvable' });
         }
         res.status(200).json(user);
@@ -58,8 +58,8 @@ exports.updateUser = async (req, res) => {
 // Supprimer un utilisateur
 exports.deleteUser = async (req, res) => {
     try {
-        const deleted = await userService.deleteUser(req.params.email);
-        if (deleted.deletedCount === 0) {
+        const deletedUser = await userService.deleteUser(req.params.email);
+        if (deletedUser.deletedCount === 0) {
             return res.status(404).json({ error: 'Utilisateur introuvable' });
         }
         res.status(204).send(); // No content
