@@ -6,6 +6,8 @@ const cors = require('cors');
 
 const mongodb = require('../api/db/mongo');
 const indexRouter = require('./src/routes/index');
+const loginRouter = require('./src/routes/login');
+const logoutRouter = require('./src/routes/logout');
 
 
 mongodb.initCLientDbConnection();
@@ -24,5 +26,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/login', loginRouter);
+app.use('/logout', logoutRouter);
 
 module.exports = app;
