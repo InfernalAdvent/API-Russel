@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const userRoute = require('../routes/users');
+const loginRoute = require('../routes/login');
+const logoutRoute = require('../routes/logout')
 
 /* GET home page. */
 router.get('/', async (req, res) => {
@@ -13,5 +15,7 @@ router.get('/', async (req, res) => {
   });
 });
 
-router.use('/users',userRoute)
+router.use('/users',userRoute);
+router.use('/login', loginRoute);
+router.use('/logout', logoutRoute)
 module.exports = router;
