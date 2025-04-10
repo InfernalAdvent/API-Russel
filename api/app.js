@@ -8,6 +8,8 @@ const mongodb = require('../api/db/mongo');
 const indexRouter = require('./src/routes/index');
 const loginRouter = require('./src/routes/login');
 const logoutRouter = require('./src/routes/logout');
+const catwaysRouter = require('./src/routes/catways');
+
 
 
 mongodb.initCLientDbConnection();
@@ -28,5 +30,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
+app.use('/catways', catwaysRouter);
 
 module.exports = app;
