@@ -20,4 +20,5 @@ router.use('/users',userRoute);
 router.use('/login', loginRoute);
 router.use('/logout', logoutRoute)
 router.use('/catways', catwaysRoute);
+
 module.exports = router;

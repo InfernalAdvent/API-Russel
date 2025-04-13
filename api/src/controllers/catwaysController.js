@@ -9,15 +9,16 @@ exports.getCatways = async (req, res) => {
     }
 };
 
-exports.getCatwayById = async (req, res) => {
+exports.getCatwayByCatwayNumber = async (req, res) => {
     try {
-        const catway = await catwayService.getCatwayById(req.params.id);
+        const catway = await catwayService.getCatwayByCatwayNumber(req.params.id);
         if (!catway) return res.status(404).json({ message: 'Catway non trouvée' });
         res.status(200).json(catway);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+  
 
 exports.addCatways = async (req, res) => {
     try {
@@ -40,6 +41,7 @@ exports.updateCatwayState = async (req, res) => {
 
 exports.deleteCatway = async (req, res) => {
     try {
+        // Utilisation de catwayNumber dans la suppression
         const deletedCatway = await catwayService.deleteCatway(req.params.id);
         if (!deletedCatway) return res.status(404).json({ message: 'Catway non trouvée' });
         res.status(200).json({ message: 'Catway supprimée' });
