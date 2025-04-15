@@ -2,23 +2,25 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-store" />
   <title>Tableau de Bord</title>
   <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
 </head>
 <body>
   <h1>Bienvenue sur le Tableau de Bord</h1>
 
+    <p id="date"></p>  
+
     <h2>Utilisateur connecté :</h2>
+    
     <p id="userName"></p>
     <p id="userEmail"></p>
   
-    <p id="date"></p>  
-
   <nav>
     <ul>
       <li><a href="/catways.html">Gérer les catways</a></li>
       <li><a href="/users.html">Liste des utilisateurs</a></li>
-      <li><a href="/login.html">Se déconnecter</a></li>
+      <li><a href="/docs/index.html" target="_blank">Documentation de l'API</a></li>
     </ul>
   </nav>
 
@@ -36,72 +38,79 @@
     <tbody id="ReservationsBody"></tbody>
   </table>
 
+  <p><a href="#" id="logoutLink">Se déconnecter</a></p>
+
   <script>
-
-async function loadUserInfo() {
-    try {
-      const res = await fetch('/me');
-      if (!res.ok) {
-        window.location.href = '/login.html';
-        return;
+    window.onload = async () => {
+      try {
+        const res = await fetch('/me');
+        if (!res.ok) {
+          window.location.href = '/index.html';
+          return;
+        }
+  
+        const user = await res.json();
+        document.getElementById('userName').textContent = `Nom : ${user.username}`;
+        document.getElementById('userEmail').textContent = `Email : ${user.email}`;
+      } catch (err) {
+        console.error('Erreur lors du chargement des infos utilisateur', err);
+        window.location.href = '/index.html';
       }
-
-      const user = await res.json();
-      document.getElementById('userName').textContent = `Nom : ${user.username}`;
-      document.getElementById('userEmail').textContent = `Email : ${user.email}`;
-    } catch (err) {
-      console.error('Erreur lors du chargement des infos utilisateur', err);
-      window.location.href = '/login.html';
-    }
-  }
-
-  loadUserInfo();
-
-      const date = document.createElement('p');
+  
+      document.getElementById('logoutLink').addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await fetch('/logout');
+          window.location.href = '/index.html';
+        } catch (err) {
+          console.error('Erreur lors de la déconnexion', err);
+        }
+      });
+  
+      // Affichage de la date
       const today = new Date().toLocaleDateString('fr-FR', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       });
-      date.textContent = `Nous sommes le ${today}`;
-      document.body.appendChild(date);
-
-async function loadAllReservations() {
-  const tableBody = document.getElementById('ReservationsBody');
-
-  try {
-    const res = await fetch('/catways/reservations');
-    const reservations = await res.json();
-
-    if (reservations.length === 0) {
-      const row = document.createElement('tr');
-      const cell = document.createElement('td');
-      cell.colSpan = 5;
-      cell.textContent = 'Aucune réservation enregistrée.';
-      row.appendChild(cell);
-      tableBody.appendChild(row);
-      return;
+      document.getElementById('date').textContent = `Nous sommes le ${today}`
+  
+      await loadAllReservations();
+    };
+  
+    async function loadAllReservations() {
+      const tableBody = document.getElementById('ReservationsBody');
+  
+      try {
+        const res = await fetch('/catways/reservations');
+        const reservations = await res.json();
+  
+        if (reservations.length === 0) {
+          const row = document.createElement('tr');
+          const cell = document.createElement('td');
+          cell.colSpan = 5;
+          cell.textContent = 'Aucune réservation enregistrée.';
+          row.appendChild(cell);
+          tableBody.appendChild(row);
+          return;
+        }
+  
+        reservations.forEach(r => {
+          const row = document.createElement('tr');
+  
+          row.innerHTML = `
+            <td><a href="reservations.html?idCatway=${r.catwayNumber}">${r.catwayNumber ?? 'N/A'}</a></td>
+            <td>${r.clientName}</td>
+            <td>${r.boatName}</td>
+            <td>${new Date(r.startDate).toLocaleDateString()}</td>
+            <td>${new Date(r.endDate).toLocaleDateString()}</td>
+          `;
+  
+          tableBody.appendChild(row);
+        });
+  
+      } catch (err) {
+        console.error('Erreur chargement réservations', err);
+      }
     }
-
-    reservations.forEach(r => {
-      const row = document.createElement('tr');
-
-      row.innerHTML = `
-        <td>${r.catwayNumber ?? 'N/A'}</td>
-        <td>${r.clientName}</td>
-        <td>${r.boatName}</td>
-        <td>${new Date(r.startDate).toLocaleDateString()}</td>
-        <td>${new Date(r.endDate).toLocaleDateString()}</td>
-      `;
-
-      tableBody.appendChild(row);
-    });
-
-  } catch (err) {
-    console.error('Erreur chargement réservations', err);
-  }
-}
-
-loadAllReservations();
-
   </script>
 </body>
 </html>

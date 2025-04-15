@@ -7,10 +7,11 @@ const authController = require('../controllers/authController');
  */
 
 /**
- * Permet de se connecter à l'API
+ * @name Login
+ * @route POST /login
  * @function
  * @param {Object} req - Requête Express
- * @param {Object} res - Requête Express
+ * @param {Object} res - Réponse Express
  */
 router.post('/', authController.login);
 

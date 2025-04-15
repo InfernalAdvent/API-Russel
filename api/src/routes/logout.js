@@ -7,10 +7,13 @@ const authController = require('../controllers/authController');
  */
 
 /**
- * Permet de se déconnecter de l'API
+ * @name Logout
+ * @route GET /logout
  * @function
  * @param {Object} req - Requête Express
- * @param {Object} res - Requête Express
+ * @param {Object} res - Réponse Express
+ * @returns {Object} - Déconnexion de l'utilisateur
+
  */
 router.get('/', authController.logout);
 

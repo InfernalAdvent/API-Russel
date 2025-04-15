@@ -3,44 +3,57 @@ const router = express.Router();
 
 const userController = require('../controllers/userController');
 
-
 /**
  * @module routes/users
  */
 
 /**
- * Récupère la liste de tous les utilsateurs 
+ * @name Get Users
+ * @route GET /users
  * @function
  * @param {Object} req - Requête Express
- * @param {Object} res - Requête Express
+ * @param {Object} res - Réponse Express
+ * @returns {Object} - Liste des utilisateurs
  */
 router.get('/', userController.getUsers);
+
 /**
- * Récupère un utilisateur avec son email
+ * @name Get User by Email
+ * @route GET /users/:email
  * @function
  * @param {Object} req - Requête Express
- * @param {Object} res - Requête Express
+ * @param {Object} res - Réponse Express
+ * @returns {Object} - L'utilisateur sélectionné par son email
  */
 router.get('/:email', userController.getUserByEmail);
+
 /**
- * Ajoute un nouvel utilisateur
+ * @name Add User
+ * @route POST /users
  * @function
  * @param {Object} req - Requête Express
- * @param {Object} res - Requête Express
+ * @param {Object} res - Réponse Express
+ * @returns {Object} - L'utilisateur ajouté
  */
 router.post('/', userController.addUsers);
+
 /**
- * Modifie un utilisateur
+ * @name Update User
+ * @route PUT /users/:email
  * @function
  * @param {Object} req - Requête Express
- * @param {Object} res - Requête Express
+ * @param {Object} res - Réponse Express
+ * @returns {Object} - L'utilisateur modifié
  */
 router.put('/:email', userController.updateUser);
+
 /**
- * Supprime un utilisateur
+ * @name Delete User
+ * @route DELETE /users/:email
  * @function
  * @param {Object} req - Requête Express
- * @param {Object} res - Requête Express
+ * @param {Object} res - Réponse Express
+ * @returns {Object} - L'utilisateur supprimé
  */
 router.delete('/:email', userController.deleteUser);
 
