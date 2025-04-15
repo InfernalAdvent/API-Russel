@@ -65,3 +65,12 @@ exports.deleteReservation = async (catwayNumber, reservationId) => {
     throw new Error(`Erreur lors de la suppression de la réservation: ${error.message}`);
   }
 };
+
+exports.getAllReservations = async () => {
+  try {
+    const reservations = await Reservation.find();
+    return reservations;
+  } catch (error) {
+    throw new Error(`Erreur lors de la récupération de toutes les réservations: ${error.message}`);
+  }
+};

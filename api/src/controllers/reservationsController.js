@@ -54,3 +54,12 @@ exports.deleteReservation = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getAllReservations = async (req, res) => {
+  try {
+    const reservations = await reservationService.getAllReservations();
+    res.status(200).json(reservations);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}

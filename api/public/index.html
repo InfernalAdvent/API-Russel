@@ -1,13 +1,68 @@
 <html>
 
 <head>
-  <title>Express</title>
+  <title>Connexion au port de plaisance de Russel</title>
   <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 
 <body>
-  <h1>Express</h1>
-  <p>Welcome to Express</p>
+  <h1>Bienvenue sur l'API du port de plaisance de Russel !</h1>
+
+  <p>Sur cette API, vous allez pouvoir accéder aux différents utilisateurs,
+    catways et réservations, les modifier et les supprimer ou en ajouter de nouveaux.
+  </p>
+  
+  <h2>Connexion</h2>
+
+  <form id="loginForm">
+    <label for="email">Email :</label>
+    <input type="email" id="email" name="email" required><br>
+
+    <label for="password">Mot de passe :</label>
+    <input type="password" id="password" name="password" required><br>
+
+    <button type="submit">Se connecter</button>
+  </form>
+
+  <a href="/docs/index.html" target="_blank">Voir la documentation de l'API</a>
+
+
+  <p id="message"></p>
+
+  <script>
+   document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  try {
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log('Connexion réussie');  
+      document.getElementById('message').textContent = 'Connexion réussie !';
+      console.log('Cookie:', document.cookie);
+      window.location.href = "/dashboard.html";
+    } else {
+      document.getElementById('message').textContent = data.message || 'Erreur de connexion';
+    }
+  } catch (err) {
+    document.getElementById('message').textContent = 'Erreur réseau';
+    console.error(err);
+  }
+});
+  </script>
+</body>
+</html>
 </body>
 
 </html>

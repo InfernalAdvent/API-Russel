@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilisateurs</title>
+</head>
+<body>
+    <table border="1px">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
+    </table>
+
+    <h2>Ajouter un nouvel utilisateur</h2>
+    <form id="addUserForm">
+        <label>Nom :
+            <input type="text" id="newUsername" required>
+        </label><br>
+        <label>Email :
+            <input type="text" id="newEmail" required>
+        </label><br>
+        <label>Mot de passe :
+            <input type="text" id="newPassword" required>
+        </label><br>
+        <button type="submit">Ajouter</button>
+    </form>
+
+    <p id="formMessage"></p>
+    <p><a href="/dashboard.html">Retour au tableau de bord</a></p>
+
+    <script>
+        const tbody = document.getElementById('usersTableBody');
+        const message = document.getElementById('formMessage');
+
+        async function fetchUsers() {
+            const res = await fetch('/users');
+            const users = await res.json();
+
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+
+                const usernameCell = document.createElement('td');
+                const link = document.createElement('a');
+                link.href = `user-detail.html?email=${user.email}`;
+                link.textContent = user.username;
+                usernameCell.appendChild(link);
+
+                const emailCell = document.createElement('td');
+                emailCell.textContent = user.email;
+
+                row.appendChild(usernameCell);
+                row.appendChild(emailCell);
+
+                tbody.appendChild(row);
+            });
+        }
+
+        document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const user = {
+                username: document.getElementById('newUsername').value,
+                email: document.getElementById('newEmail').value,
+                password: document.getElementById('newPassword').value
+            };
+
+            try {
+                const res = await fetch('/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(user)
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    message.textContent = 'Utilisateur ajouté avec succès !';
+                    fetchUsers();
+                    e.target.reset();
+                } else {
+                    message.textContent = data.error || "Erreur lors de l'ajout.";
+                }
+            } catch (err) {
+                console.error(err);
+                message.textContent = 'Erreur réseau';
+            }
+        });
+
+        fetchUsers();
+    </script>
+</body>
+</html>

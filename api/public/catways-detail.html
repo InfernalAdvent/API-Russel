@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail du Catway</title>
+</head>
+<body>
+    <h1>Détail du Catway</h1>
+
+    <div id="catwayDetails">
+      <p><strong>Numéro :</strong> <span id="catwayNumber"></span></p>
+      <p><strong>Type :</strong> <span id="catwayType"></span></p>
+      <form id="updateForm">
+        <label>État :
+          <input type="text" id="catwayState">
+        </label><br>
+  
+        <button type="submit">Mettre à jour</button>
+      </form>
+  
+      <button id="deleteBtn" style="margin-top: 10px; background-color: red; color: white;">Supprimer le catway</button>
+      <p><a id="viewReservationsBtn">Voir les réservations</a></p>
+      <p><a href="/catways.html">Retour à la liste des catways</a></p>
+    </div>
+  
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const catwayNumber = params.get('id');
+  
+      const numberSpan = document.getElementById('catwayNumber');
+      const typeSpan = document.getElementById('catwayType');
+      const stateInput = document.getElementById('catwayState');
+  
+      async function fetchCatway() {
+        const res = await fetch(`/catways/${catwayNumber}`);
+        const catway = await res.json();
+  
+        numberSpan.textContent = catway.catwayNumber;
+        typeSpan.textContent = catway.catwayType;
+        stateInput.value = catway.catwayState;
+      }
+  
+      document.getElementById('updateForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+  
+        const data = {
+          catwayState: stateInput.value
+        };
+  
+        const res = await fetch(`/catways/${catwayNumber}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+  
+        if (res.ok) {
+          alert('Mise à jour réussie !');
+          fetchCatway();
+        } else {
+          const err = await res.json();
+          alert(err.error || 'Erreur lors de la mise à jour');
+        }
+      });
+  
+      document.getElementById('deleteBtn').addEventListener('click', async () => {
+        if (confirm('Supprimer ce catway ?')) {
+          const res = await fetch(`/catways/${catwayNumber}`, {
+            method: 'DELETE'
+          });
+  
+          if (res.ok) {
+            alert('Catway supprimé.');
+            window.location.href = '/catways.html';
+          } else {
+            const err = await res.json();
+            alert(err.error || 'Erreur lors de la suppression');
+          }
+        }
+      });
+  
+      fetchCatway();
+      document.getElementById('viewReservationsBtn').href = `/reservations.html?idCatway=${catwayNumber}`;
+    </script>
+  </body>
+  </html>
+</body>
+</html>

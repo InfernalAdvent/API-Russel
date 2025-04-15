@@ -9,6 +9,9 @@ const indexRouter = require('./src/routes/index');
 const loginRouter = require('./src/routes/login');
 const logoutRouter = require('./src/routes/logout');
 const catwaysRouter = require('./src/routes/catways');
+const meRouter = require('./src/routes/me');
+const checkAuth = require('./src/middlewares/authMiddleware');  // Assure-toi d'importer ton middleware
+
 
 
 
@@ -18,7 +21,8 @@ const app = express();
 
 app.use(cors({
     exposedHeaders: ['Authorization'],
-    origin: '*'
+    origin: '*',
+    credentials: true
 }));
 
 app.use(logger('dev'));
@@ -31,5 +35,11 @@ app.use('/', indexRouter);
 app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 app.use('/catways', catwaysRouter);
+app.use('/me', meRouter);
+
+// Route protégée pour le tableau de bord
+app.use('/dashboard', checkAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+  });
 
 module.exports = app;
