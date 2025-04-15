@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de la réservation</title>
+</head>
+<body>
+    <h1>Détail de la réservation</h1>
+
+    <div id="reservationDetails">
+      <p><strong>Numéro :</strong> <span id="catwayNumber"></span></p>
+      <form id="updateForm">
+        <label>Nom du client :
+          <input type="text" id="clientName">
+        </label><br>
+        <label>Nom du bateau :
+            <input type="text" id="boatName">
+          </label><br>
+          <label>Date de début de location :
+            <input type="date" id="startDate">
+          </label><br>
+          <label>Date de fin de location :
+            <input type="date" id="endDate">
+          </label><br>
+  
+        <button type="submit">Mettre à jour</button>
+      </form>
+  
+      <button id="deleteBtn" style="margin-top: 10px; background-color: red; color: white;">Supprimer cette réservation</button>
+      <p><a id="backLink">Retour à la liste des réservations</a></p>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const catwayNumber = params.get('idCatway');
+      const reservationId = params.get('idReservation');
+    
+      // Afficher l'ID du catway sur la page
+      document.getElementById('catwayNumber').textContent = catwayNumber;
+
+      const clientInput = document.getElementById('clientName');
+      const boatInput = document.getElementById('boatName');
+      const startInput = document.getElementById('startDate');
+      const endInput = document.getElementById('endDate');
+    
+      // Récupérer et afficher les détails de la réservation
+      async function fetchReservation() {
+        const res = await fetch(`/catways/${catwayNumber}/reservations/${reservationId}`);
+        const reservations = await res.json();
+
+        clientInput.value = reservations.clientName;
+        boatInput.value = reservations.boatName;
+        startInput.value = new Date(reservations.startDate).toISOString().split('T')[0];
+        endInput.value = new Date(reservations.endDate).toISOString().split('T')[0];
+      }
+
+      document.getElementById('updateForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const data = {
+          clientName: clientInput.value,
+          boatName: boatInput.value,
+          startDate: startInput.value,
+          endDate: endInput.value,
+        };
+
+        const res = await fetch(`/catways/${catwayNumber}/reservations/${reservationId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          alert('Mise à jour réussie !');
+          fetchReservation();
+        } else {
+          const err = await res.json();
+          alert(err.error || 'Erreur lors de la mise à jour');
+        }
+      });
+
+      document.getElementById('deleteBtn').addEventListener('click', async () => {
+        if (confirm('Supprimer cette réservation ?')) {
+          const res = await fetch(`/catways/${catwayNumber}/reservations/${reservationId}`, {
+            method: 'DELETE'
+          });
+  
+          if (res.ok) {
+            alert('Réservation supprimée.');
+            window.location.href = `/reservations.html?idCatway=${catwayNumber}`;
+          } else {
+            const err = await res.json();
+            alert(err.error || 'Erreur lors de la suppression');
+          }
+        }
+      });
+    
+      fetchReservation();
+      document.getElementById('backLink').href = `/reservations.html?idCatway=${catwayNumber}`;
+    </script>

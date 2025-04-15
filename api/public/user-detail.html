@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail de l'utilisateur</title>
+</head>
+<body>
+    <h1>Détail de l'utilisateur</h1>
+
+    <div id="userDetails">
+      <form id="updateForm">
+        <label>Nom :
+          <input type="text" id="username">
+        </label><br>
+        <label>Email :
+            <input type="text" id="email">
+        </label><br>
+        <label>Mot de passe :
+            <input type="text" id="password">
+        </label><br>
+  
+        <button type="submit">Mettre à jour</button>
+      </form>
+  
+      <button id="deleteBtn" style="margin-top: 10px; background-color: red; color: white;">Supprimer l'utilisateur</button>
+      <p><a href="/users.html">Retour à la liste des utilisateurs</a></p>
+    </div>
+  
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const userEmail = params.get('email');
+  
+      const usernameInput = document.getElementById('username');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+  
+      async function fetchUsers() {
+        const res = await fetch(`/users/${userEmail}`);
+        const user = await res.json();
+  
+        usernameInput.value = user.username;
+        emailInput.value = user.email;
+        passwordInput.value = user.password;
+      }
+  
+      document.getElementById('updateForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+  
+        const data = {
+            username: usernameInput.value,
+            email: emailInput.value,
+            password: passwordInput.value
+        };
+  
+        const res = await fetch(`/users/${userEmail}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+  
+        if (res.ok) {
+          alert('Mise à jour réussie !');
+          fetchUsers();
+        } else {
+          const err = await res.json();
+          alert(err.error || 'Erreur lors de la mise à jour');
+        }
+      });
+  
+      document.getElementById('deleteBtn').addEventListener('click', async () => {
+        if (confirm('Supprimer cet utilisateur ?')) {
+          const res = await fetch(`/users/${userEmail}`, {
+            method: 'DELETE'
+          });
+  
+          if (res.ok) {
+            alert('Utilisateur supprimé.');
+            window.location.href = '/users.html';
+          } else {
+            const err = await res.json();
+            alert(err.error || 'Erreur lors de la suppression');
+          }
+        }
+      });
+  
+      fetchUsers();
+    </script>
+  </body>
+  </html>
+</body>
+</html>

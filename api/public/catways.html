@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catways</title>
+</head>
+<body>
+  <h1>Liste des Catways</h1>
+  <h2>Cliquez sur le numéro de Catway pour le modifier ou accéder aux réservations</h2>
+    <table border="1px">
+        <thead>
+          <tr>
+            <th>Numéro</th>
+            <th>Type</th>
+            <th>État</th>
+          </tr>
+        </thead>
+        <tbody id="catwayTableBody"></tbody>
+      </table>
+    
+      <h2>Ajouter un nouveau Catway</h2>
+      <form id="addCatwayForm">
+        <label>Numéro :
+          <input type="number" id="newCatwayNumber" required>
+        </label><br>
+        <label>Type :
+          <select id="newCatwayType" required>
+            <option value="short">Short</option>
+            <option value="long">Long</option>
+          </select>
+        </label><br>
+        <label>État :
+          <input type="text" id="newCatwayState" required>
+        </label><br>
+        <button type="submit">Ajouter</button>
+      </form>
+    
+      <p id="formMessage"></p>
+      <p><a href="/dashboard.html">Retour au tableau de bord</a></p>
+    
+      <script>
+        const tbody = document.getElementById('catwayTableBody');
+        const message = document.getElementById('formMessage');
+    
+        async function fetchCatways() {
+          const res = await fetch('/catways');
+          const catways = await res.json();
+    
+          tbody.innerHTML = ''; // reset
+    
+          catways.forEach(catway => {
+            const row = document.createElement('tr');
+    
+            const numberCell = document.createElement('td');
+            const link = document.createElement('a');
+            link.href = `catways-detail.html?id=${catway.catwayNumber}`;
+            link.textContent = catway.catwayNumber;
+            numberCell.appendChild(link);
+    
+            const typeCell = document.createElement('td');
+            typeCell.textContent = catway.catwayType;
+    
+            const stateCell = document.createElement('td');
+            stateCell.textContent = catway.catwayState;
+    
+            row.appendChild(numberCell);
+            row.appendChild(typeCell);
+            row.appendChild(stateCell);
+    
+            tbody.appendChild(row);
+          });
+        }
+    
+        document.getElementById('addCatwayForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+    
+          const newCatway = {
+            catwayNumber: parseInt(document.getElementById('newCatwayNumber').value),
+            catwayType: document.getElementById('newCatwayType').value,
+            catwayState: document.getElementById('newCatwayState').value
+          };
+    
+          try {
+            const res = await fetch('/catways', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newCatway)
+            });
+    
+            const data = await res.json();
+    
+            if (res.ok) {
+              message.textContent = 'Catway ajouté avec succès !';
+              fetchCatways(); // refresh
+              e.target.reset();
+            } else {
+              message.textContent = data.error || 'Erreur lors de l’ajout.';
+            }
+          } catch (err) {
+            console.error(err);
+            message.textContent = 'Erreur réseau';
+          }
+        });
+    
+        fetchCatways();
+      </script>
+    </body>
+    </html>
+
+</body>
+</html>

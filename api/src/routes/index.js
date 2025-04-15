@@ -6,7 +6,6 @@ const loginRoute = require('../routes/login');
 const logoutRoute = require('../routes/logout')
 const catwaysRoute = require('../routes/catways')
 
-/* GET home page. */
 router.get('/', async (req, res) => {
   res.status(200).json({
     name : process.env.APP_NAME,

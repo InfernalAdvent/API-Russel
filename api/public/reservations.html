@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réservations de Catways</title>
+</head>
+<body>
+    <h1>Réservations du Catway <span id="catwayNumber"></span></h1>
+    <p id="noReservationMessage" style="font-weight: bold; color: gray;"></p>
+    
+    <table id="reservationTable" style="display: none;">
+        <thead>
+          <tr>
+            <th>Numéro</th>
+            <th>Nom du client</th>
+            <th>Nom du bateau</th>
+            <th>Date de location</th>
+            <th>Date de fin de location</th>
+          </tr>
+        </thead>
+        <tbody id="reservationTableBody"></tbody>
+    </table>
+    
+    <h2>Ajouter une nouvelle réservation</h2>
+    <form id="addReservationForm">
+        <label>Nom du client :
+            <input type="text" id="newClientName" required>
+        </label><br>
+        <label>Nom du bateau :
+            <input type="text" id="newBoatName" required>
+        </label><br>
+        <label>Date de début de location :
+            <input type="date" id="newStartDate" required>
+        </label><br>
+        <label>Date de fin de location :
+            <input type="date" id="newEndDate" required>
+        </label><br>
+        <button type="submit">Ajouter</button>
+    </form>
+    
+    <p id="formMessage"></p>
+    <p><a href="/dashboard.html">Retour au tableau de bord</a></p>
+
+    <script>
+        const tbody = document.getElementById('reservationTableBody');
+        const message = document.getElementById('formMessage');
+        const catwayNumberSpan = document.getElementById('catwayNumber');
+        const reservationTable = document.getElementById('reservationTable');
+        const noReservationMessage = document.getElementById('noReservationMessage');
+        
+        const params = new URLSearchParams(window.location.search);
+        const catwayNumber = params.get('idCatway');
+        catwayNumberSpan.textContent = catwayNumber;
+
+        async function fetchReservations() {
+            tbody.innerHTML = '';
+            message.textContent = '';
+            noReservationMessage.textContent = '';
+            reservationTable.style.display = 'none'; // Masquer par défaut
+
+            try {
+                const res = await fetch(`/catways/${catwayNumber}/reservations`);
+                if (!res.ok) {
+                    message.textContent = 'Erreur serveur ou réservation introuvable';
+                    return;
+                }
+
+                const reservations = await res.json();
+
+                if (reservations.length === 0) {
+                    noReservationMessage.textContent = 'Aucune réservation pour ce catway.';
+                    return;
+                }
+
+                reservationTable.style.display = 'table'; // Affiche la table s’il y a des données
+
+                reservations.forEach((reservation, index) => {
+                    const tr = document.createElement('tr');
+
+                    const link = document.createElement('a');
+                    link.href = `/reservation-detail.html?idReservation=${reservation._id}&idCatway=${catwayNumber}`;
+                    link.textContent = `Réservation ${index + 1}`;
+
+                    const tdNum = document.createElement('td');
+                    tdNum.appendChild(link);
+
+                    const tdClient = document.createElement('td');
+                    tdClient.textContent = reservation.clientName;
+
+                    const tdBoat = document.createElement('td');
+                    tdBoat.textContent = reservation.boatName;
+
+                    const tdStart = document.createElement('td');
+                    tdStart.textContent = new Date(reservation.startDate).toLocaleDateString();
+
+                    const tdEnd = document.createElement('td');
+                    tdEnd.textContent = new Date(reservation.endDate).toLocaleDateString();
+
+                    tr.appendChild(tdNum);
+                    tr.appendChild(tdClient);
+                    tr.appendChild(tdBoat);
+                    tr.appendChild(tdStart);
+                    tr.appendChild(tdEnd);
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+                message.textContent = 'Erreur lors du chargement des réservations.';
+            }
+        }
+
+        document.getElementById('addReservationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const clientName = document.getElementById('newClientName').value;
+            const boatName = document.getElementById('newBoatName').value;
+            const startDate = document.getElementById('newStartDate').value;
+            const endDate = document.getElementById('newEndDate').value;
+
+            const body = {
+                clientName,
+                boatName,
+                startDate,
+                endDate,
+                catwayNumber: Number(catwayNumber)
+            };
+
+            try {
+                const res = await fetch(`/catways/${catwayNumber}/reservations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (res.ok) {
+                    message.textContent = 'Réservation ajoutée avec succès';
+                    e.target.reset();
+                    fetchReservations(); // Recharge
+                } else {
+                    const err = await res.json();
+                    message.textContent = err.error || "Erreur lors de l'ajout";
+                }
+            } catch (err) {
+                console.error(err);
+                message.textContent = 'Erreur réseau';
+            }
+        });
+
+        fetchReservations();
+    </script>
+</body>
+</html>
