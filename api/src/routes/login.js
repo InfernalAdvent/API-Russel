@@ -12,6 +12,7 @@ const authController = require('../controllers/authController');
  * @function
  * @param {Object} req - Requête Express
  * @param {Object} res - Réponse Express
+ * @returns {Object} - Connexion de l'utilisateur
  */
 router.post('/', authController.login);
 
