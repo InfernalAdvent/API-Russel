@@ -8,6 +8,7 @@ const mongodb = require('../api/db/mongo');
 const loginRouter = require('./src/routes/login');
 const logoutRouter = require('./src/routes/logout');
 const catwaysRouter = require('./src/routes/catways');
+const usersRouter = require('./src/routes/users')
 const meRouter = require('./src/routes/me');
 const checkAuth = require('./src/middlewares/authMiddleware');  // Assure-toi d'importer ton middleware
 
@@ -32,6 +33,7 @@ app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 app.use('/catways', catwaysRouter);
 app.use('/me', meRouter);
+app.use('users', usersRouter)
 
 // Route protégée pour le tableau de bord
 app.use('/dashboard', checkAuth, (req, res) => {
