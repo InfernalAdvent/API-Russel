@@ -33,7 +33,7 @@ app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 app.use('/catways', catwaysRouter);
 app.use('/me', meRouter);
-app.use('users', usersRouter)
+app.use('/users', usersRouter)
 
 // Route protégée pour le tableau de bord
 app.use('/dashboard', checkAuth, (req, res) => {

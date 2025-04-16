@@ -39,7 +39,7 @@
         const message = document.getElementById('formMessage');
 
         async function fetchUsers() {
-            const res = await fetch('/users');
+            const res = await fetch('https://api-russel-5rng.onrender.com/users');
             const users = await res.json();
 
             tbody.innerHTML = '';
